@@ -1,0 +1,44 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "CloudFormation template for EventBridge rule 'trigger-ecs'",
+  "Resources": {
+    "EventRule0": {
+      "Type": "AWS::Events::Rule",
+      "Properties": {
+        "EventBusName": "default",
+        "EventPattern": {
+          "source": ["aws.s3"],
+          "detail-type": ["Object Created", "Object Deleted"],
+          "detail": {
+            "bucket": {
+              "name": ["120191-test-ecs-trigger"]
+            }
+          }
+        },
+        "Name": "trigger-ecs",
+        "State": "ENABLED",
+        "Targets": [{
+          "Id": "Id0572faa6-0b6c-4d16-8763-777f2e58833d",
+          "Arn": "arn:aws:sqs:us-east-1:522911216413:test"
+        }, {
+          "Id": "Idc2f3fadb-1c67-4cd7-a949-9f535d018abe",
+          "Arn": "arn:aws:ecs:us-east-1:522911216413:cluster/test",
+          "RoleArn": "arn:aws:iam::522911216413:role/service-role/Amazon_EventBridge_Invoke_ECS_7969280731",
+          "EcsParameters": {
+            "TaskDefinitionArn": "arn:aws:ecs:us-east-1:522911216413:task-definition/demo_ecs",
+            "TaskCount": 1,
+            "LaunchType": "FARGATE",
+            "NetworkConfiguration": {
+              "awsvpcConfiguration": {
+                "Subnets": ["subnet-0ab147cdcf766a9b1", "subnet-0878bc7463b0e7054", "subnet-0bc6e9e83b364a7e4", "subnet-0cc6ed973b4be3fa7", "subnet-0e53dbc2c3a74105f", "subnet-0c54afd2dfd23c130"],
+                "AssignPublicIp": "ENABLED"
+              }
+            },
+            "EnableECSManagedTags": true,
+            "EnableExecuteCommand": false
+          }
+        }]
+      }
+    }
+  }
+}

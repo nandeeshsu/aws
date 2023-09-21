@@ -1,0 +1,53 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "CloudFormation template for EventBridge rule 'trigger-ecs-for-s3-event-rule'",
+  "Resources": {
+    "EventRule0": {
+      "Type": "AWS::Events::Rule",
+      "Properties": {
+        "Description": "Capture S3 events on uploads and delete objects from bucket",
+        "EventBusName": "default",
+        "EventPattern": {
+          "detail": {
+            "bucket": {
+              "name": ["120191-test-ecs-trigger-120191"]
+            }
+          },
+          "detail-type": ["Object Created", "Object Deleted"],
+          "source": ["aws.s3"]
+        },
+        "Name": "trigger-ecs-for-s3-event-rule",
+        "State": "ENABLED",
+        "Targets": [{
+          "Id": "s3-event-ecs-target",
+          "Arn": "arn:aws:ecs:us-east-1:511817881636:cluster/test",
+          "RoleArn": "arn:aws:iam::511817881636:role/eventbridge-invoke-ecs-task-role",
+          "InputTransformer": {
+            "InputPathsMap": {
+              "s3_bucket_name": "$.detail.bucket.name",
+              "s3_object_key": "$.detail.object.key"
+            },
+            "InputTemplate": "{\n  \"containerOverrides\": [\n    {\n      \"name\": \"ecs-task-dump-env-vars\",\n      \"environment\" : [\n        {\n          \"name\" : \"S3_BUCKET_NAME\",\n          \"value\" : <s3_bucket_name>\n        },\n        {\n          \"name\" : \"S3_OBJECT_KEY\",\n          \"value\" : <s3_object_key>\n        }\n      ]\n    }\n  ]\n}\n"
+          },
+          "EcsParameters": {
+            "TaskDefinitionArn": "arn:aws:ecs:us-east-1:511817881636:task-definition/demo_ecs:1",
+            "TaskCount": 1,
+            "LaunchType": "FARGATE",
+            "NetworkConfiguration": {
+              "awsvpcConfiguration": {
+                "Subnets": ["subnet-0b694c9a127b37667", "subnet-08682a4af5d1c00a6", "subnet-0a4535851e47b274b", "subnet-049430dfd7b98de4e", "subnet-0065847cdecaf7811", "subnet-00bca796de569c705"],
+                "AssignPublicIp": "ENABLED"
+              }
+            },
+            "EnableECSManagedTags": false,
+            "EnableExecuteCommand": false,
+            "PropagateTags": "TASK_DEFINITION"
+          }
+        }, {
+          "Id": "terraform-20230920152126213000000002",
+          "Arn": "arn:aws:sqs:us-east-1:511817881636:s3-event-trigger-sqs-queue"
+        }]
+      }
+    }
+  }
+}
