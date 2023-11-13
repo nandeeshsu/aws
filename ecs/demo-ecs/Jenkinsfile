@@ -44,7 +44,7 @@ pipeline {
             steps {
                 script{
                     docker.withRegistry("${params.ECR_REPO_URL}", 'ecr:us-east-1:cloud_user') {
-                        app.push("${params.ECR_REPO_URL}/demo_ecs")
+                        //app.push("${params.ECR_REPO_URL}/demo_ecs")
                         app.push("latest")
                     }
                 }
