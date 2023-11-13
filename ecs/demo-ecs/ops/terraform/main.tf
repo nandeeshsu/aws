@@ -12,7 +12,7 @@ terraform {
 locals {
   bucket_name     = "120191-test-ecs-trigger-120191"
   event_bus_name  = "default"
-  vpc_id = "vpc-0d5dbae97d80196c1"
+  vpc_id = "vpc-00c915b5e4fee83ff"
   //ecs_subnet_id = "subnet-0ab147cdcf766a9b1,subnet-0878bc7463b0e7054,subnet-0bc6e9e83b364a7e4,subnet-0cc6ed973b4be3fa7,subnet-0e53dbc2c3a74105f,subnet-0c54afd2dfd23c130"
 }
 
@@ -24,10 +24,15 @@ provider "aws" {
   //secret_key = var.secret_key
 }
 
+data "aws_vpc" "default" {
+  default = true
+}
+
 data "aws_subnets" "my_subnets" {
   filter {
     name   = "vpc-id"
-    values = [local.vpc_id]
+    //values = [local.vpc_id]
+    values = [data.aws_vpc.default.id]
   }
 }
 
@@ -191,7 +196,7 @@ resource "aws_cloudwatch_event_target" "s3-event-ecs-target" {
     }
   }
   input_transformer  {
-    # This section plucks the values we need from the event
+    # This section plucks the values we need from the event, can have upto 10 key/value
     input_paths = {
       s3_bucket_name   = "$.detail.bucket.name",
       s3_object_key    = "$.detail.object.key"
@@ -213,11 +218,7 @@ resource "aws_cloudwatch_event_target" "s3-event-ecs-target" {
         {
           "name" : "S3_OBJECT_KEY",
           "value" : <s3_object_key>
-        },
-#        {
-#          "name" : "DETAIL_OBJECT",
-#          "value" : { "detail": $.detail }
-#        }
+        }
       ]
     }
   ]
