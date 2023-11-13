@@ -3,6 +3,10 @@ pipeline {
     options {
         skipStagesAfterUnstable()
     }
+
+    parameters {
+        string(name: 'ECR_REPO_URL', defaultValue: 'NONE', description: 'AWS ECR Repository HTTP URL')
+    }
     stages {
          /* stage('Clone repository') {
             steps {
@@ -39,9 +43,9 @@ pipeline {
         stage('Deploy') {
             steps {
                 script{
-                    docker.withRegistry('https://316445831419.dkr.ecr.us-east-1.amazonaws.com/demo_ecs', 'ecr:us-east-1:cloud_user') {
-                    app.push("${env.BUILD_NUMBER}")
-                    app.push("latest")
+                    docker.withRegistry("${params.ECR_REPO_URL}", 'ecr:us-east-1:cloud_user') {
+                        //app.push("${env.BUILD_NUMBER}")
+                        app.push("${params.ECR_REPO_URL}")
                     }
                 }
             }
