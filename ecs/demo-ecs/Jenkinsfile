@@ -35,11 +35,13 @@ pipeline {
                 }
             }
         }
+
         stage('Test'){
             steps {
                  echo 'Empty'
             }
         }
+
         stage('Deploy') {
             steps {
                 script{
@@ -47,6 +49,50 @@ pipeline {
                         //app.push("${params.ECR_REPO_URL}/demo_ecs")
                         app.push("latest")
                     }
+                }
+            }
+        }
+
+        stage('Image Scanning') {
+            steps {
+                script{
+                    withAWS(credentials:'cloud_user', region: 'us-east-1'){
+                        //Grab the imageDigest of the latest image with the tag test
+                        def digest_image = sh(
+                            script: "aws ecr describe-images --repository-name nandeeshsu/demo_ecs --image-ids imageTag=latest --query 'imageDetails[0].imageDigest'",
+                            returnStdout: true
+                        ).trim()
+
+                        // Wait for the image scan to complete
+                        sh "aws ecr wait image-scan-complete --repository-name nandeeshsu/demo_ecs --image-id imageDigest=$digest_image"
+
+                        def scan_findings = sh(
+                            script: "aws ecr describe-image-scan-findings --repository-name nandeeshsu/demo_ecs --image-id imageDigest=$digest_image",
+                            returnStdout: true
+                        ).trim()
+                        writeFile file: IMAGE_SCAN_FINDINGS, text: scan_findings
+                    }
+
+//                     sh '''  aws ecr start-image-scan --registry-id 592640137521 \
+//                        --repository-name nandeeshsu/demo_ecs \
+//                        --no-paginate \
+//                        --image-id imageDigest=${BUILD_NUMBER} --output json | tee ecr_start_scan_${BUILD_NUMBER}.txt'''
+//
+//                     sh '''  aws ecr start-image-scan --registry-id 592640137521 \
+//                        --repository-name nandeeshsu/demo_ecs \
+//                        --no-paginate \
+//                        --image-id imageDigest=${BUILD_NUMBER} --output json | tee ecr_start_scan_${BUILD_NUMBER}.txt'''
+//
+//                     sh '''  aws ecr wait image-scan-complete --registry-id 592640137521 \
+//                        --repository-name nandeeshsu/demo_ecs \
+//                        --no-paginate \
+//                        --image-id imageDigest=${BUILD_NUMBER} --output json | tee ecr_scan_complete_${BUILD_NUMBER}.txt'''
+//
+//                     sh ''' aws ecr describe-image-scan-findings --registry-id 123 \
+//                       --repository-name nandeeshsu/demo_ecs \
+//                       --no-paginate \
+//                       --image-id imageDigest=${BUILD_NUMBER}  --output json | tee ecr_scanResult_${BUILD_NUMBER}.txt'''
+
                 }
             }
         }
