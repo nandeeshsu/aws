@@ -4,17 +4,18 @@ pipeline {
         skipStagesAfterUnstable()
     }
     stages {
-         stage('Clone repository') {
+         /* stage('Clone repository') {
             steps {
                 script{
                 checkout scm
                 }
             }
-        }
+        } */
 
         stage('Code Build') {
             steps {
                 script{
+                    sh 'cd ecs/demo-ecs'
                     sh './gradlew clean build -x test --no-daemon' //run a gradle task
                 }
             }
