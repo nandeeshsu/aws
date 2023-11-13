@@ -15,8 +15,9 @@ pipeline {
         stage('Code Build') {
             steps {
                 script{
-                    sh 'cd ecs/demo-ecs'
-                    sh './gradlew clean build -x test --no-daemon' //run a gradle task
+                    dir('${WORKSPACE}/ecs/demo-ecs') {
+                        sh './gradlew clean build -x test --no-daemon' //run a gradle task
+                    }
                 }
             }
         }
@@ -24,7 +25,9 @@ pipeline {
         stage('Docker Image Build') {
             steps {
                 script{
-                 app = docker.build("nandeeshsu/demo_ecs")
+                    dir('${WORKSPACE}/ecs/demo-ecs') {
+                        app = docker.build("nandeeshsu/demo_ecs")
+                    }
                 }
             }
         }
