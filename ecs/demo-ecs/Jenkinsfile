@@ -1,0 +1,46 @@
+pipeline {
+    agent any
+    options {
+        skipStagesAfterUnstable()
+    }
+    stages {
+         stage('Clone repository') {
+            steps {
+                script{
+                checkout scm
+                }
+            }
+        }
+
+        stage('Code Build') {
+            steps {
+                script{
+                    sh './gradlew clean build -x test --no-daemon' //run a gradle task
+                }
+            }
+        }
+
+        stage('Docker Image Build') {
+            steps {
+                script{
+                 app = docker.build("nandeeshsu/demo_ecs")
+                }
+            }
+        }
+        stage('Test'){
+            steps {
+                 echo 'Empty'
+            }
+        }
+        stage('Deploy') {
+            steps {
+                script{
+                    docker.withRegistry('https://316445831419.dkr.ecr.us-east-1.amazonaws.com/demo_ecs', 'ecr:us-east-2:aws-credentials') {
+                    app.push("${env.BUILD_NUMBER}")
+                    app.push("latest")
+                    }
+                }
+            }
+        }
+    }
+}
