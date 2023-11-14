@@ -89,33 +89,40 @@ pipeline {
                         echo "SEVERITY_COUNTS: ${SEVERITY_COUNTS}"
 
                       def CRITICAL = sh(
-                        script: "echo $SEVERITY_COUNTS | jq '.CRITICAL'",
+                        script: "echo ${SEVERITY_COUNTS} | jq '.CRITICAL'",
                         returnStdout: true
-                      )
+                      ).trim()
+                      echo "CRITICAL: ${CRITICAL}"
 
                       def HIGH = sh(
-                        script: "echo $SEVERITY_COUNTS | jq '.HIGH'",
+                        script: "echo ${SEVERITY_COUNTS} | jq '.HIGH'",
                         returnStdout: true
-                      )
+                      ).trim()
+                      echo "HIGH: ${HIGH}"
 
                       def MEDIUM = sh(
-                        script: "echo $SEVERITY_COUNTS | jq '.MEDIUM'",
-                        returnStdout: true).trim()
+                        script: "echo ${SEVERITY_COUNTS} | jq '.MEDIUM'",
+                        returnStdout: true
+                      ).trim()
+                        echo "MEDIUM: ${MEDIUM}"
 
                       def LOW = sh(
-                        script: "echo $SEVERITY_COUNTS | jq '.LOW'",
+                        script: "echo ${SEVERITY_COUNTS} | jq '.LOW'",
                         returnStdout: true
-                      )
+                      ).trim()
+                      echo "LOW: ${LOW}"
 
                       def INFORMATIONAL = sh(
-                        script: "echo $SEVERITY_COUNTS | jq '.INFORMATIONAL'",
+                        script: "echo ${SEVERITY_COUNTS} | jq '.INFORMATIONAL'",
                         returnStdout: true
-                      )
+                      ).trim()
+                      echo "INFORMATIONAL: ${INFORMATIONAL}"
 
                       def UNDEFINED = sh(
-                        script: "echo $SEVERITY_COUNTS | jq '.UNDEFINED'",
+                        script: "echo ${SEVERITY_COUNTS} | jq '.UNDEFINED'",
                         returnStdout: true
-                      )
+                      ).trim()
+                      echo "UNDEFINED: ${UNDEFINED}"
 
                       if ( $CRITICAL != null || $HIGH != null ) {
                         echo Docker image contains vulnerabilities at CRITICAL or HIGH
