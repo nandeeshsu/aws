@@ -76,13 +76,13 @@ pipeline {
                         // Wait for the image scan to complete
                         sh "aws ecr wait image-scan-complete --repository-name nandeeshsu/demo_ecs --image-id imageDigest=$digest_image"
 
-//                         def scan_findings = sh(
-//                             script: "aws ecr describe-image-scan-findings --repository-name nandeeshsu/demo_ecs --no-paginate --image-id imageDigest=$digest_image",
-//                             returnStdout: true
-//                         ).trim()
-//                         writeFile file: "scan_findings.txt", text: scan_findings
+                        def SCAN_FINDINGS = sh(
+                            script: "aws ecr describe-image-scan-findings --repository-name nandeeshsu/demo_ecs --no-paginate --image-id imageDigest=$digest_image",
+                            returnStdout: true
+                        ).trim()
+//                         writeFile file: "scan_findings.txt", text: SCAN_FINDINGS
 
-                          SCAN_FINDINGS=$(aws ecr describe-image-scan-findings --repository-name nandeeshsu/demo_ecs --image-id imageDigest=$digest_image | jq '.imageScanFindings.findingSeverityCounts')
+                          //SCAN_FINDINGS=$(aws ecr describe-image-scan-findings --repository-name nandeeshsu/demo_ecs --image-id imageDigest=$digest_image | jq '.imageScanFindings.findingSeverityCounts')
                           CRITICAL=$(echo $SCAN_FINDINGS | jq '.CRITICAL')
                           HIGH=$(echo $SCAN_FINDINGS | jq '.HIGH')
                           MEDIUM=$(echo $SCAN_FINDINGS | jq '.MEDIUM')
