@@ -71,38 +71,31 @@ pipeline {
                             script: "aws ecr start-image-scan --repository-name nandeeshsu/demo_ecs --no-paginate --image-id imageDigest=$digest_image",
                             returnStdout: true
                         ).trim()
-                        writeFile file: "start_image_scan_result.txt", text: start_image_scan_result
+                        //writeFile file: "start_image_scan_result.txt", text: start_image_scan_result
 
                         // Wait for the image scan to complete
                         sh "aws ecr wait image-scan-complete --repository-name nandeeshsu/demo_ecs --image-id imageDigest=$digest_image"
 
-                        def scan_findings = sh(
-                            script: "aws ecr describe-image-scan-findings --repository-name nandeeshsu/demo_ecs --no-paginate --image-id imageDigest=$digest_image",
-                            returnStdout: true
-                        ).trim()
-                        writeFile file: "scan_findings.txt", text: scan_findings
+//                         def scan_findings = sh(
+//                             script: "aws ecr describe-image-scan-findings --repository-name nandeeshsu/demo_ecs --no-paginate --image-id imageDigest=$digest_image",
+//                             returnStdout: true
+//                         ).trim()
+//                         writeFile file: "scan_findings.txt", text: scan_findings
+
+                        if [ $(echo $?) -eq 0 ]; then
+                          SCAN_FINDINGS=$(aws ecr describe-image-scan-findings --repository-name nandeeshsu/demo_ecs --image-id imageDigest=$digest_image | jq '.imageScanFindings.findingSeverityCounts')
+                          CRITICAL=$(echo $SCAN_FINDINGS | jq '.CRITICAL')
+                          HIGH=$(echo $SCAN_FINDINGS | jq '.HIGH')
+                          MEDIUM=$(echo $SCAN_FINDINGS | jq '.MEDIUM')
+                          LOW=$(echo $SCAN_FINDINGS | jq '.LOW')
+                          INFORMATIONAL=$(echo $SCAN_FINDINGS | jq '.INFORMATIONAL')
+                          UNDEFINED=$(echo $SCAN_FINDINGS | jq '.UNDEFINED')
+                          if [ $CRITICAL != null ] || [ $HIGH != null ]; then
+                            echo Docker image contains vulnerabilities at CRITICAL or HIGH
+                            exit 1  #exit execution due to docker image vulnerabilities
+                          fi
+                        fi
                     }
-
-//                     sh '''  aws ecr start-image-scan --registry-id 592640137521 \
-//                        --repository-name nandeeshsu/demo_ecs \
-//                        --no-paginate \
-//                        --image-id imageDigest=${BUILD_NUMBER} --output json | tee ecr_start_scan_${BUILD_NUMBER}.txt'''
-//
-//                     sh '''  aws ecr start-image-scan --registry-id 592640137521 \
-//                        --repository-name nandeeshsu/demo_ecs \
-//                        --no-paginate \
-//                        --image-id imageDigest=${BUILD_NUMBER} --output json | tee ecr_start_scan_${BUILD_NUMBER}.txt'''
-//
-//                     sh '''  aws ecr wait image-scan-complete --registry-id 592640137521 \
-//                        --repository-name nandeeshsu/demo_ecs \
-//                        --no-paginate \
-//                        --image-id imageDigest=${BUILD_NUMBER} --output json | tee ecr_scan_complete_${BUILD_NUMBER}.txt'''
-//
-//                     sh ''' aws ecr describe-image-scan-findings --registry-id 123 \
-//                       --repository-name nandeeshsu/demo_ecs \
-//                       --no-paginate \
-//                       --image-id imageDigest=${BUILD_NUMBER}  --output json | tee ecr_scanResult_${BUILD_NUMBER}.txt'''
-
                 }
             }
         }
