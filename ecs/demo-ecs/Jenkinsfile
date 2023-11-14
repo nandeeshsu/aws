@@ -79,23 +79,24 @@ pipeline {
                         def SCAN_FINDINGS = sh(
                             script: "aws ecr describe-image-scan-findings --repository-name nandeeshsu/demo_ecs --no-paginate --image-id imageDigest=$digest_image",
                             returnStdout: true
-                        ).trim()
+                        )
 //                         writeFile file: "scan_findings.txt", text: SCAN_FINDINGS
 
                        def SEVERITY_COUNTS = sh(
                            script: "echo $SCAN_FINDINGS | jq '.imageScanFindings.findingSeverityCounts'",
                            returnStdout: true
-                         ).trim()
+                         )
+                        echo $SEVERITY_COUNTS
 
                       def CRITICAL = sh(
                         script: "echo $SEVERITY_COUNTS | jq '.CRITICAL'",
                         returnStdout: true
-                      ).trim()
+                      )
 
                       def HIGH = sh(
                         script: "echo $SEVERITY_COUNTS | jq '.HIGH'",
                         returnStdout: true
-                      ).trim()
+                      )
 
                       def MEDIUM = sh(
                         script: "echo $SEVERITY_COUNTS | jq '.MEDIUM'",
@@ -104,17 +105,17 @@ pipeline {
                       def LOW = sh(
                         script: "echo $SEVERITY_COUNTS | jq '.LOW'",
                         returnStdout: true
-                      ).trim()
+                      )
 
                       def INFORMATIONAL = sh(
                         script: "echo $SEVERITY_COUNTS | jq '.INFORMATIONAL'",
                         returnStdout: true
-                      ).trim()
+                      )
 
                       def UNDEFINED = sh(
                         script: "echo $SEVERITY_COUNTS | jq '.UNDEFINED'",
                         returnStdout: true
-                      ).trim()
+                      )
 
                       if ( $CRITICAL != null || $HIGH != null ) {
                         echo Docker image contains vulnerabilities at CRITICAL or HIGH
