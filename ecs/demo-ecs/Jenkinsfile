@@ -77,18 +77,21 @@ pipeline {
                         sh "aws ecr wait image-scan-complete --repository-name nandeeshsu/demo_ecs --image-id imageDigest=$digest_image"
 
                         def SCAN_FINDINGS = sh(
-                            script: "aws ecr describe-image-scan-findings --repository-name nandeeshsu/demo_ecs --no-paginate --image-id imageDigest=$digest_image",
+                            script: "aws ecr describe-image-scan-findings --repository-name nandeeshsu/demo_ecs --no-paginate --image-id imageDigest=$digest_image | jq '.imageScanFindings.findingSeverityCounts' ",
                             returnStdout: true
                         ).trim()
 //                         writeFile file: "scan_findings.txt", text: SCAN_FINDINGS
 
-                          //SCAN_FINDINGS=$(aws ecr describe-image-scan-findings --repository-name nandeeshsu/demo_ecs --image-id imageDigest=$digest_image | jq '.imageScanFindings.findingSeverityCounts')
-                          CRITICAL=$(echo $SCAN_FINDINGS | jq '.CRITICAL')
-                          HIGH=$(echo $SCAN_FINDINGS | jq '.HIGH')
-                          MEDIUM=$(echo $SCAN_FINDINGS | jq '.MEDIUM')
-                          LOW=$(echo $SCAN_FINDINGS | jq '.LOW')
-                          INFORMATIONAL=$(echo $SCAN_FINDINGS | jq '.INFORMATIONAL')
-                          UNDEFINED=$(echo $SCAN_FINDINGS | jq '.UNDEFINED')
+                          CRITICAL=sh(
+                            script: "echo $SCAN_FINDINGS | jq '.CRITICAL'"
+                            returnStdout: true
+                          ).trim()
+
+                          HIGH=sh( script: "echo $SCAN_FINDINGS | jq '.HIGH' " returnStdout: true).trim()
+                          MEDIUM=sh( script: "echo $SCAN_FINDINGS | jq '.MEDIUM'" returnStdout: true).trim()
+                          LOW=sh( script: "echo $SCAN_FINDINGS | jq '.LOW'" returnStdout: true).trim()
+                          INFORMATIONAL=sh( script: "echo $SCAN_FINDINGS | jq '.INFORMATIONAL'" returnStdout: true).trim()
+                          UNDEFINED=sh( script: "echo $SCAN_FINDINGS | jq '.UNDEFINED'" returnStdout: true).trim()
                           if ( $CRITICAL != null ) || ( $HIGH != null ); then
                             echo Docker image contains vulnerabilities at CRITICAL or HIGH
                             exit 1  #exit execution due to docker image vulnerabilities
