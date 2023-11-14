@@ -51,7 +51,16 @@ pipeline {
                 script{
                     docker.withRegistry("${params.ECR_REPO_URL}", 'ecr:us-east-1:cloud_user') {
                         //app.push("${params.ECR_REPO_URL}/demo_ecs")
-                        app.push("latest")
+                        def pushOutput = app.push("latest")
+
+                        // Extract SHA digest from the push output
+                        def imageShaDigest = pushOutput =~ /digest: sha256:(\w+)/ ? "sha256:${it[0][1]}" : null
+
+                        if (imageShaDigest != null) {
+                            echo "Image SHA Digest: ${imageShaDigest}"
+                        } else {
+                            error("Failed to extract the SHA digest from the push output.")
+                        }
                     }
                 }
             }
