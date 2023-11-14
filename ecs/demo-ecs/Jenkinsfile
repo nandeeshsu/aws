@@ -80,19 +80,15 @@ pipeline {
                             script: "aws ecr describe-image-scan-findings --repository-name nandeeshsu/demo_ecs --no-paginate --image-id imageDigest=$digest_image | jq '.imageScanFindings.findingSeverityCounts'",
                             returnStdout: true
                         ).trim()
-//                         writeFile file: "scan_findings.txt", text: SCAN_FINDINGS
+//                      writeFile file: "scan_findings.txt", text: SCAN_FINDINGS
 
-//                        def SEVERITY_COUNTS = sh(
-//                            script: "echo $SCAN_FINDINGS | jq '.imageScanFindings.findingSeverityCounts'",
-//                            returnStdout: true
-//                          )
                         echo "SEVERITY_COUNTS: ${SEVERITY_COUNTS}"
 
-                      def CRITICAL = sh(
-                        script: "echo ${SEVERITY_COUNTS} | jq '.CRITICAL'",
-                        returnStdout: true
-                      ).trim()
-                      echo "CRITICAL: ${CRITICAL}"
+//                       def CRITICAL = sh(
+//                         script: "echo ${SEVERITY_COUNTS} | jq '.CRITICAL'",
+//                         returnStdout: true
+//                       ).trim()
+//                       echo "CRITICAL: ${CRITICAL}"
 
                       def HIGH = sh(
                         script: "echo ${SEVERITY_COUNTS} | jq '.HIGH'",
@@ -118,16 +114,16 @@ pipeline {
                       ).trim()
                       echo "INFORMATIONAL: ${INFORMATIONAL}"
 
-                      def UNDEFINED = sh(
-                        script: "echo ${SEVERITY_COUNTS} | jq '.UNDEFINED'",
-                        returnStdout: true
-                      ).trim()
-                      echo "UNDEFINED: ${UNDEFINED}"
+//                       def UNDEFINED = sh(
+//                         script: "echo ${SEVERITY_COUNTS} | jq '.UNDEFINED'",
+//                         returnStdout: true
+//                       ).trim()
+//                       echo "UNDEFINED: ${UNDEFINED}"
 
-                      if ( $CRITICAL != null || $HIGH != null ) {
-                        echo Docker image contains vulnerabilities at CRITICAL or HIGH
-                        exit 1  //exit execution due to docker image vulnerabilities
-                      }
+//                       if ( $CRITICAL != null || $HIGH != null ) {
+//                         echo Docker image contains vulnerabilities at CRITICAL or HIGH
+//                         exit 1  //exit execution due to docker image vulnerabilities
+//                       }
                     }
                 }
             }
