@@ -77,37 +77,42 @@ pipeline {
                         sh "aws ecr wait image-scan-complete --repository-name nandeeshsu/demo_ecs --image-id imageDigest=$digest_image"
 
                         def SCAN_FINDINGS = sh(
-                            script: "aws ecr describe-image-scan-findings --repository-name nandeeshsu/demo_ecs --no-paginate --image-id imageDigest=$digest_image | jq '.imageScanFindings.findingSeverityCounts' ",
+                            script: "aws ecr describe-image-scan-findings --repository-name nandeeshsu/demo_ecs --no-paginate --image-id imageDigest=$digest_image",
                             returnStdout: true
                         ).trim()
 //                         writeFile file: "scan_findings.txt", text: SCAN_FINDINGS
 
+                       def SEVERITY_COUNTS = sh(
+                           script: "echo $SCAN_FINDINGS | jq '.imageScanFindings.findingSeverityCounts'",
+                           returnStdout: true
+                         ).trim()
+
                       def CRITICAL = sh(
-                        script: "echo $SCAN_FINDINGS | jq '.CRITICAL'",
+                        script: "echo $SEVERITY_COUNTS | jq '.CRITICAL'",
                         returnStdout: true
                       ).trim()
 
                       def HIGH = sh(
-                        script: "echo $SCAN_FINDINGS | jq '.HIGH' ",
+                        script: "echo $SEVERITY_COUNTS | jq '.HIGH'",
                         returnStdout: true
                       ).trim()
 
                       def MEDIUM = sh(
-                        script: "echo $SCAN_FINDINGS | jq '.MEDIUM'",
+                        script: "echo $SEVERITY_COUNTS | jq '.MEDIUM'",
                         returnStdout: true).trim()
 
                       def LOW = sh(
-                        script: "echo $SCAN_FINDINGS | jq '.LOW'",
+                        script: "echo $SEVERITY_COUNTS | jq '.LOW'",
                         returnStdout: true
                       ).trim()
 
                       def INFORMATIONAL = sh(
-                        script: "echo $SCAN_FINDINGS | jq '.INFORMATIONAL'",
+                        script: "echo $SEVERITY_COUNTS | jq '.INFORMATIONAL'",
                         returnStdout: true
                       ).trim()
 
                       def UNDEFINED = sh(
-                        script: "echo $SCAN_FINDINGS | jq '.UNDEFINED'",
+                        script: "echo $SEVERITY_COUNTS | jq '.UNDEFINED'",
                         returnStdout: true
                       ).trim()
 
