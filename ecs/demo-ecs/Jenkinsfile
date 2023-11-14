@@ -4,9 +4,9 @@ pipeline {
         skipStagesAfterUnstable()
     }
 
-    environment {
-        AWS_CREDENTIALS = credentials('cloud_user')
-    }
+//     environment {
+//         AWS_CREDENTIALS = credentials('cloud_user')
+//     }
 
     parameters {
         string(name: 'ECR_REPO_URL', defaultValue: 'NONE', description: 'AWS ECR Repository HTTP URL')
@@ -60,7 +60,7 @@ pipeline {
         stage('Image Scanning') {
             steps {
                 script{
-                    withAWS(credentials:'AWS_CREDENTIALS', region: 'us-east-1'){
+                    withAWS(credentials:'cloud_user', region: 'us-east-1'){
                         //Grab the imageDigest of the latest image with the tag test
                         def digest_image = sh(
                             script: "aws ecr describe-images --repository-name nandeeshsu/demo_ecs --image-ids imageTag=latest --query 'imageDetails[0].imageDigest'",
