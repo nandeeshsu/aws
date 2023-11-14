@@ -54,9 +54,15 @@ pipeline {
                         app.push("latest")
 
                         // Extract SHA digest from the console output
-                        def imageShaDigest = currentBuild.rawBuild.getLog(100).findAll { line ->
-                            line.contains('latest: digest: sha256:')
-                        }*.replaceAll('.*latest: digest: sha256:(\\w+).*', 'sha256:$1').find()
+                        def lines = currentBuild.rawBuild.getLog(100)
+                        def imageShaDigest
+
+                        for (line in lines) {
+                            if (line.contains('latest: digest: sha256:')) {
+                                imageShaDigest = line.replaceAll('.*latest: digest: sha256:(\\w+).*', 'sha256:$1')
+                                break
+                            }
+                        }
 
                         if (imageShaDigest != null) {
                             echo "Image SHA Digest: ${imageShaDigest}"
