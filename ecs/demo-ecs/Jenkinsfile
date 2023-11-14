@@ -154,17 +154,18 @@ pipeline {
     }
 }
 
-@NonCPS
 def extractShaDigestFromConsole() {
-    def lines = currentBuild.rawBuild.getLog(100)
-    def imageShaDigest
+    return script {
+        def lines = currentBuild.rawBuild.getLog(100)
+        def imageShaDigest
 
-    for (line in lines) {
-        if (line.contains('latest: digest: sha256:')) {
-            imageShaDigest = line.replaceAll('.*latest: digest: sha256:(\\w+).*', 'sha256:$1')
-            break
+        for (line in lines) {
+            if (line.contains('latest: digest: sha256:')) {
+                imageShaDigest = line.replaceAll('.*latest: digest: sha256:(\\w+).*', 'sha256:$1')
+                break
+            }
         }
-    }
 
-    return imageShaDigest
+        return imageShaDigest
+    }
 }
