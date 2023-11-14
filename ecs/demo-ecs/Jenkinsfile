@@ -82,7 +82,7 @@ pipeline {
                         ).trim()
 //                      writeFile file: "scan_findings.txt", text: SCAN_FINDINGS
 
-                        //echo "SEVERITY_COUNTS: ${SEVERITY_COUNTS}"
+                        echo "SEVERITY_COUNTS: ${SEVERITY_COUNTS}"
 
 //                       def CRITICAL = sh(
 //                         script: "echo ${SEVERITY_COUNTS} | jq '.CRITICAL'",
@@ -96,23 +96,23 @@ pipeline {
 //                       ).trim()
 //                       echo "HIGH: ${HIGH}"
 
-                      def MEDIUM = sh(
-                        script: "echo ${SEVERITY_COUNTS} | jq '.MEDIUM'",
-                        returnStdout: true
-                      ).trim()
-                        echo "MEDIUM: ${MEDIUM}"
-
-                      def LOW = sh(
-                        script: "echo ${SEVERITY_COUNTS} | jq '.LOW'",
-                        returnStdout: true
-                      ).trim()
-                      echo "LOW: ${LOW}"
-
-                      def INFORMATIONAL = sh(
-                        script: "echo ${SEVERITY_COUNTS} | jq '.INFORMATIONAL'",
-                        returnStdout: true
-                      ).trim()
-                      echo "INFORMATIONAL: ${INFORMATIONAL}"
+//                       def MEDIUM = sh(
+//                         script: "echo ${SEVERITY_COUNTS} | jq '.MEDIUM'",
+//                         returnStdout: true
+//                       ).trim()
+//                         echo "MEDIUM: ${MEDIUM}"
+//
+//                       def LOW = sh(
+//                         script: "echo ${SEVERITY_COUNTS} | jq '.LOW'",
+//                         returnStdout: true
+//                       ).trim()
+//                       echo "LOW: ${LOW}"
+//
+//                       def INFORMATIONAL = sh(
+//                         script: "echo ${SEVERITY_COUNTS} | jq '.INFORMATIONAL'",
+//                         returnStdout: true
+//                       ).trim()
+//                       echo "INFORMATIONAL: ${INFORMATIONAL}"
 
 //                       def UNDEFINED = sh(
 //                         script: "echo ${SEVERITY_COUNTS} | jq '.UNDEFINED'",
@@ -127,6 +127,18 @@ pipeline {
                     }
                 }
             }
+        }
+
+        post {
+                // Clean after build
+                always {
+                    cleanWs(cleanWhenNotBuilt: false,
+                            deleteDirs: true,
+                            disableDeferredWipeout: true,
+                            notFailBuild: true,
+                            patterns: [[pattern: '.gitignore', type: 'INCLUDE'],
+                                       [pattern: '.propsfile', type: 'EXCLUDE']])
+                }
         }
     }
 }
