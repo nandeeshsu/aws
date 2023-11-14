@@ -82,7 +82,7 @@ pipeline {
 //                         ).trim()
 //                         writeFile file: "scan_findings.txt", text: scan_findings
 
-                        if [ $(echo $?) -eq 0 ]; then
+                        if ( $(echo $?) -eq 0 ); then
                           SCAN_FINDINGS=$(aws ecr describe-image-scan-findings --repository-name nandeeshsu/demo_ecs --image-id imageDigest=$digest_image | jq '.imageScanFindings.findingSeverityCounts')
                           CRITICAL=$(echo $SCAN_FINDINGS | jq '.CRITICAL')
                           HIGH=$(echo $SCAN_FINDINGS | jq '.HIGH')
