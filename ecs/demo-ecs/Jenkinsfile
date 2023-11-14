@@ -53,6 +53,8 @@ pipeline {
                         //app.push("${params.ECR_REPO_URL}/demo_ecs")
                         def pushOutput = app.push("latest")
 
+                        echo "pushOutput: ${pushOutput}"
+
                         // Extract SHA digest from the push output
                         def imageShaDigest = pushOutput =~ /digest: sha256:(\w+)/ ? "sha256:${it[0][1]}" : null
 
