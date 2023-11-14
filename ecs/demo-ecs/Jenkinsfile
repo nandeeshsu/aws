@@ -120,9 +120,9 @@ pipeline {
                       ).trim()
                       echo "UNDEFINED: ${UNDEFINED}"
 
-                      if ( $CRITICAL != null || $HIGH != null ) {
-                        echo Docker image contains vulnerabilities at CRITICAL or HIGH
-                        exit 1  //exit execution due to docker image vulnerabilities
+                      if ( CRITICAL != null || HIGH != null ) {
+                        echo "Docker image contains vulnerabilities at CRITICAL or HIGH"
+                        error('Exiting execution due to docker image vulnerabilities')  //exit execution due to docker image vulnerabilities
                       }
                     }
                 }
