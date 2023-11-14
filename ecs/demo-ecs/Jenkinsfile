@@ -92,10 +92,10 @@ pipeline {
                           LOW=sh( script: "echo $SCAN_FINDINGS | jq '.LOW'", returnStdout: true).trim()
                           INFORMATIONAL=sh( script: "echo $SCAN_FINDINGS | jq '.INFORMATIONAL'", returnStdout: true).trim()
                           UNDEFINED=sh( script: "echo $SCAN_FINDINGS | jq '.UNDEFINED'", returnStdout: true).trim()
-                          if ( $CRITICAL != null || $HIGH != null ); then
+                          if ( $CRITICAL != null || $HIGH != null ) {
                             echo Docker image contains vulnerabilities at CRITICAL or HIGH
                             exit 1  #exit execution due to docker image vulnerabilities
-                          fi
+                          }
                     }
                 }
             }
