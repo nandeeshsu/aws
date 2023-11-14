@@ -67,8 +67,12 @@ pipeline {
                             returnStdout: true
                         ).trim()
 
-                        sh "aws ecr start-image-scan --repository-name nandeeshsu/demo_ecs --no-paginate --image-id imageDigest=$digest_image --output json | tee ecr_start_scan_$digest_image.txt"
-
+                        def start_image_scan_result = sh(
+                            script: "aws ecr start-image-scan --repository-name nandeeshsu/demo_ecs --no-paginate --image-id imageDigest=$digest_image",
+                            returnStdout: true
+                        ).trim()
+                        writeFile file: START_IMAGE_SCAN_RESULT, text: start_image_scan_result
+                        
                         // Wait for the image scan to complete
                         sh "aws ecr wait image-scan-complete --repository-name nandeeshsu/demo_ecs --image-id imageDigest=$digest_image"
 
