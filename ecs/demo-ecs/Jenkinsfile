@@ -83,15 +83,15 @@ pipeline {
 //                         writeFile file: "scan_findings.txt", text: SCAN_FINDINGS
 
                           CRITICAL=sh(
-                            script: "echo $SCAN_FINDINGS | jq '.CRITICAL'"
+                            script: "echo $SCAN_FINDINGS | jq '.CRITICAL'",
                             returnStdout: true
                           ).trim()
 
-                          HIGH=sh( script: "echo $SCAN_FINDINGS | jq '.HIGH' " returnStdout: true).trim()
-                          MEDIUM=sh( script: "echo $SCAN_FINDINGS | jq '.MEDIUM'" returnStdout: true).trim()
-                          LOW=sh( script: "echo $SCAN_FINDINGS | jq '.LOW'" returnStdout: true).trim()
-                          INFORMATIONAL=sh( script: "echo $SCAN_FINDINGS | jq '.INFORMATIONAL'" returnStdout: true).trim()
-                          UNDEFINED=sh( script: "echo $SCAN_FINDINGS | jq '.UNDEFINED'" returnStdout: true).trim()
+                          HIGH=sh( script: "echo $SCAN_FINDINGS | jq '.HIGH' ", returnStdout: true).trim()
+                          MEDIUM=sh( script: "echo $SCAN_FINDINGS | jq '.MEDIUM'", returnStdout: true).trim()
+                          LOW=sh( script: "echo $SCAN_FINDINGS | jq '.LOW'", returnStdout: true).trim()
+                          INFORMATIONAL=sh( script: "echo $SCAN_FINDINGS | jq '.INFORMATIONAL'", returnStdout: true).trim()
+                          UNDEFINED=sh( script: "echo $SCAN_FINDINGS | jq '.UNDEFINED'", returnStdout: true).trim()
                           if ( $CRITICAL != null ) || ( $HIGH != null ); then
                             echo Docker image contains vulnerabilities at CRITICAL or HIGH
                             exit 1  #exit execution due to docker image vulnerabilities
