@@ -76,16 +76,16 @@ pipeline {
                         // Wait for the image scan to complete
                         sh "aws ecr wait image-scan-complete --repository-name nandeeshsu/demo_ecs --image-id imageDigest=$digest_image"
 
-                        def SCAN_FINDINGS = sh(
-                            script: "aws ecr describe-image-scan-findings --repository-name nandeeshsu/demo_ecs --no-paginate --image-id imageDigest=$digest_image",
+                        def SEVERITY_COUNTS = sh(
+                            script: "aws ecr describe-image-scan-findings --repository-name nandeeshsu/demo_ecs --no-paginate --image-id imageDigest=$digest_image | jq '.imageScanFindings.findingSeverityCounts'",
                             returnStdout: true
-                        )
+                        ).trim()
 //                         writeFile file: "scan_findings.txt", text: SCAN_FINDINGS
 
-                       def SEVERITY_COUNTS = sh(
-                           script: "echo $SCAN_FINDINGS | jq '.imageScanFindings.findingSeverityCounts'",
-                           returnStdout: true
-                         )
+//                        def SEVERITY_COUNTS = sh(
+//                            script: "echo $SCAN_FINDINGS | jq '.imageScanFindings.findingSeverityCounts'",
+//                            returnStdout: true
+//                          )
                         echo $SEVERITY_COUNTS
 
                       def CRITICAL = sh(
