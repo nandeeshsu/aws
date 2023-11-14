@@ -90,11 +90,11 @@ pipeline {
 //                       ).trim()
 //                       echo "CRITICAL: ${CRITICAL}"
 
-                      def HIGH = sh(
-                        script: "echo ${SEVERITY_COUNTS} | jq '.HIGH'",
-                        returnStdout: true
-                      ).trim()
-                      echo "HIGH: ${HIGH}"
+//                       def HIGH = sh(
+//                         script: "echo ${SEVERITY_COUNTS} | jq '.HIGH'",
+//                         returnStdout: true
+//                       ).trim()
+//                       echo "HIGH: ${HIGH}"
 
                       def MEDIUM = sh(
                         script: "echo ${SEVERITY_COUNTS} | jq '.MEDIUM'",
