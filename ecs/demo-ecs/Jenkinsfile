@@ -21,10 +21,19 @@ pipeline {
         } */
 
         stage('Code Build') {
+             when {
+                anyOf {
+                    branch 'develop';
+                    branch 'hotfix-*';
+                    branch 'feature-*';
+                    branch 'release-*';
+                }
+            }
             steps {
                 script{
                     dir('ecs/demo-ecs') {
                         sh './gradlew clean build -x test --no-daemon' //run a gradle task
+                        sh './docker-build'
                     }
                 }
             }
@@ -47,8 +56,17 @@ pipeline {
         }
 
         stage('Deploy') {
+            when {
+                anyOf {
+                    tag 'dev-*';
+                    tag 'sit-*';
+                    tag 'uat-*';
+                    tag 'pre-*';
+                }
+            }
             steps {
                 script{
+                    sh './docker-build'
                     docker.withRegistry("${params.ECR_REPO_URL}", 'ecr:us-east-1:cloud_user') {
                         //app.push("${params.ECR_REPO_URL}/demo_ecs")
                         app.push("latest")
